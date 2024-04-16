@@ -15,7 +15,9 @@
 #define NEGATIVE_FLAG 0x80
 
 // Opcodes
-#define OP_LDA_IM 0xA9
+// LDA - Load accumulator with memory
+#define OP_LDA_IM 0xA9 // Immediate addressing mode
+#define OP_LDA_ZP 0xA5 // Zero page addressing mode
 
 typedef struct {
   word PC; // Program counter
