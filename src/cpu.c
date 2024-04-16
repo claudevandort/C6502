@@ -42,6 +42,14 @@ void execute(CPU *cpu, Memory *memory, uint *cycles) {
         setProcessorStatusLDA(cpu);
         break;
       }
+      case OP_LDA_ZPX: {
+        byte address = fetchByte(cpu, memory, cycles); // Fetch zero page address
+        address = (address + cpu->X) % 256; // Calculate effective address with wrap-around
+        byte data = CPUreadByte(memory, address, cycles);
+        cpu->A = data;
+        setProcessorStatusLDA(cpu);
+        break;
+      }
     }
   }
 }
