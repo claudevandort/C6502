@@ -13,3 +13,23 @@ I chose C99 since I want as little language abstractions as possible, and also, 
 - CPU/memory model, and basic operations.
 - Implementation of [opcodes](http://www.6502.org/tutorials/6502opcodes.html) (probably won't be complete).
 - Testing of capabilities using CUnit.
+
+## Getting started
+
+Compile
+
+```bash
+make build
+```
+
+Run demo
+
+```bash
+make run
+```
+
+Build and run tests
+
+```bash
+make test
+```
