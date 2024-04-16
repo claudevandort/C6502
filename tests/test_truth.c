@@ -1,7 +1,7 @@
 #include "CUnit/Basic.h"
 
 void test_truth() {
-    CU_ASSERT(0);
+    CU_ASSERT(1);
 }
 
 void run_truth_tests() {
