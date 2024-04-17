@@ -216,7 +216,7 @@ void test_lda_zpx_x_is_zero() {
   CU_ASSERT(!(cpu.PS & ZERO_FLAG));
 }
 
-void test_lda_absolute() {
+void test_lda_absolute_positive() {
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -239,6 +239,48 @@ void test_lda_absolute() {
   CU_ASSERT(!(cpu.PS & ZERO_FLAG));      // Assuming testValue is not zero
 }
 
+void test_lda_absolute_zero() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  word testAddress = 0x1234;
+  byte testValue = 0x00;
+  writeByte(&memory, testAddress, testValue);
+
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABS);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(cpu.PS & ZERO_FLAG);
+  CU_ASSERT(!(cpu.PS & NEGATIVE_FLAG));
+}
+
+void test_lda_absolute_negative() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  word testAddress = 0x1234;
+  byte testValue = 0x80;
+  writeByte(&memory, testAddress, testValue);
+
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABS);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT(!(cpu.PS & ZERO_FLAG));
+}
+
 void run_cpu_tests() {
   CU_pSuite suite = CU_add_suite("CPU tests", 0, 0);
   CU_pSuite suite_op = CU_add_suite("Opcode tests", 0, 0);
@@ -259,5 +301,7 @@ void run_cpu_tests() {
   CU_add_test(suite_op, "LDA Zero Page X with Negative Value", test_lda_zpx_negative);
   CU_add_test(suite_op, "LDA Zero Page X with X=0", test_lda_zpx_x_is_zero);
 
-  CU_add_test(suite_op, "LDA Absolute mode", test_lda_absolute);
+  CU_add_test(suite_op, "LDA Absolute mode with positive value", test_lda_absolute_positive);
+  CU_add_test(suite_op, "LDA Absolute mode with zero", test_lda_absolute_zero);
+  CU_add_test(suite_op, "LDA Absolute mode with negative value", test_lda_absolute_negative);
 }
