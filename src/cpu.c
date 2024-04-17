@@ -25,6 +25,13 @@ byte fetchByte(CPU *cpu, Memory *memory, uint *cycles) {
   return data;
 }
 
+word fetchWord(CPU *cpu, Memory *memory, uint *cycles) {
+  byte low = fetchByte(cpu, memory, cycles);
+  byte high = fetchByte(cpu, memory, cycles);
+  word data = (high << 8) | low;
+  return data;
+}
+
 /*
  * LDA instruction
 */
@@ -59,12 +66,21 @@ void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
   LDA_setPS(cpu);
 }
 
+// LDA absolute addressing mode
+void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->A = data;
+  LDA_setPS(cpu);
+}
+
 instructionHandler instructions[256];
 
 void initInstructions() {
   instructions[OP_LDA_IM] = LDA_IM;
   instructions[OP_LDA_ZP] = LDA_ZP;
   instructions[OP_LDA_ZPX] = LDA_ZPX;
+  instructions[OP_LDA_ABS] = LDA_ABS;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {

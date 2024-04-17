@@ -216,20 +216,48 @@ void test_lda_zpx_x_is_zero() {
   CU_ASSERT(!(cpu.PS & ZERO_FLAG));
 }
 
+void test_lda_absolute() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  word testAddress = 0x1234;
+  byte testValue = 0x78;
+  writeByte(&memory, testAddress, testValue);
+  
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABS);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+  //writeByte(&memory, cpu.PC + 1, testAddress & 0xFF);       // Low byte of the address
+  //writeByte(&memory, cpu.PC + 2, (testAddress >> 8) & 0xFF); // High byte of the address
+  
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(!(cpu.PS & NEGATIVE_FLAG));  // Assuming testValue is not negative
+  CU_ASSERT(!(cpu.PS & ZERO_FLAG));      // Assuming testValue is not zero
+}
+
 void run_cpu_tests() {
   CU_pSuite suite = CU_add_suite("CPU tests", 0, 0);
   CU_pSuite suite_op = CU_add_suite("Opcode tests", 0, 0);
 
   CU_add_test(suite, "CPU reset", test_cpu_reset);
   CU_add_test(suite, "Fetch byte", test_fetch_byte);
+
   CU_add_test(suite_op, "LDA Immediate mode with a positive value", test_lda_immediate_positive);
   CU_add_test(suite_op, "LDA Immediate mode with a zero value", test_lda_immediate_zero);
   CU_add_test(suite_op, "LDA Immediate mode with a negative value", test_lda_immediate_negative);
+
   CU_add_test(suite_op, "LDA Zero Page mode with a positive value", test_lda_zero_page_positive);
   CU_add_test(suite_op, "LDA Zero Page mode with a zero value", test_lda_zero_page_zero);
   CU_add_test(suite_op, "LDA Zero Page mode with a negative value", test_lda_zero_page_negative);
+
   CU_add_test(suite_op, "LDA Zero Page X with Positive Value", test_lda_zpx_positive);
   CU_add_test(suite_op, "LDA Zero Page X with Zero", test_lda_zpx_zero);
   CU_add_test(suite_op, "LDA Zero Page X with Negative Value", test_lda_zpx_negative);
   CU_add_test(suite_op, "LDA Zero Page X with X=0", test_lda_zpx_x_is_zero);
+
+  CU_add_test(suite_op, "LDA Absolute mode", test_lda_absolute);
 }
