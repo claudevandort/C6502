@@ -32,6 +32,9 @@ typedef struct {
 
 } CPU;
 
+typedef void (*instructionHandler)(CPU *cpu, Memory *memory, uint *cycles);
+
+void initInstructions();
 void reset(CPU *cpu, Memory *memory);
 byte fetchByte(CPU *cpu, Memory *memory, uint *cycles);
 void execute(CPU *cpu, Memory *memory, uint *cycles);
