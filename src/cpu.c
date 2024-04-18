@@ -61,6 +61,7 @@ void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
 void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
   address = (address + cpu->X) % 256;
+  (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
@@ -69,6 +70,16 @@ void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA absolute addressing mode
 void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
   word address = fetchWord(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->A = data;
+  LDA_setPS(cpu);
+}
+
+// LDA absolute X addressing mode
+void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address = address + cpu->X;
+  (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
@@ -87,8 +98,6 @@ void execute(CPU *cpu, Memory *memory, uint *cycles) {
   while(*cycles > 0) {
     byte opcode = fetchByte(cpu, memory, cycles);
     instructionHandler handler = instructions[opcode];
-    if(handler) {
-      handler(cpu, memory, cycles);
-    }
+    handler(cpu, memory, cycles);
   }
 }

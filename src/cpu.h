@@ -21,6 +21,7 @@
 #define OP_LDA_ZP 0xA5 // Zero page addressing mode
 #define OP_LDA_ZPX 0xB5 // Zero page X addressing mode
 #define OP_LDA_ABS 0xAD // Absolute addressing mode
+#define OP_LDA_ABSX 0xBD // Absolute X addressing mode
 
 typedef struct {
   word PC; // Program counter

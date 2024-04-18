@@ -4,6 +4,7 @@ LANG_STD = -std=c99
 SOURCE = src/*.c
 OUTPUT = bin/C6502
 
+DEBUG_FLAGS = -g
 TEST_OUTPUT = bin/tests
 
 UNAME_S := $(shell uname -s)
@@ -22,8 +23,14 @@ build:
 run:
 	./$(OUTPUT)
 
+build-tests:
+	$(CC) $(COMPILER_FLAGS) $(DEBUG_FLAGS) $(LANG_STD) \
+		tests/*.c src/memory.c src/cpu.c \
+		$(INCLUDE_PATHS) $(LIBRARY_PATHS) \
+		-o $(TEST_OUTPUT) -lcunit
+
+run-tests:
+	./$(TEST_OUTPUT)
+
 test:
-	$(CC) $(COMPILER_FLAGS) $(LANG_STD) \
-	tests/*.c src/memory.c src/cpu.c \
-	$(INCLUDE_PATHS) $(LIBRARY_PATHS) \
-	-o $(TEST_OUTPUT) -lcunit && ./$(TEST_OUTPUT)
+	make build-tests && make run-tests
