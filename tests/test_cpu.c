@@ -29,6 +29,19 @@ void test_fetch_byte() {
   CU_ASSERT(cycles == 0);
 }
 
+void test_fetch_word() {
+  reset(&cpu, &memory);
+  cpu.PC = 0x1000; // Setting an arbitrary start position
+  writeWord(&memory, 0x1000, 0xABCD); // Write a known value
+
+  uint cycles = 2;
+  word result = fetchWord(&cpu, &memory, &cycles);
+
+  CU_ASSERT(result == 0xABCD);
+  CU_ASSERT(cpu.PC == 0x1002);
+  CU_ASSERT(cycles == 0);
+}
+
 void test_lda_immediate_positive() {
   reset(&cpu, &memory);
 
@@ -301,7 +314,7 @@ void test_lda_abs_x_positive() {
   // Set up memory and CPU for test
   cpu.PC = 0x0100; // Arbitrary position
   cpu.X = 0x01;
-  word testAddress = 0x0123;
+  word testAddress = 0x0010;
   byte testValue = 0x78;
   writeByte(&memory, (testAddress + cpu.X), testValue);
 
@@ -323,7 +336,7 @@ void test_lda_abs_x_zero() {
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
-  word testAddress = 0x1234;
+  word testAddress = 0x0010;
   byte testValue = 0x00;
   writeByte(&memory, testAddress, testValue);
 
@@ -345,7 +358,7 @@ void test_lda_abs_x_negative() {
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
-  word testAddress = 0x1234;
+  word testAddress = 0x0010;
   byte testValue = 0x80;
   writeByte(&memory, testAddress, testValue);
 
@@ -366,8 +379,9 @@ void test_lda_abs_x_negative() {
 void test_lda_abs_x_page_cross() {
   reset(&cpu, &memory);
 
-  cpu.X = 0xFF;
-  word baseAddress = 0x20F0;  // Near end of page, will cross with X added
+  cpu.PC = 0x0110;
+  cpu.X = 0x01;
+  word baseAddress = 0x00FF;  // Near end of page, will cross with X added
   byte testValue = 0x42;
   writeByte(&memory, baseAddress + cpu.X, testValue);
 
@@ -384,12 +398,81 @@ void test_lda_abs_x_page_cross() {
   CU_ASSERT(cycles == 0);
 }
 
+void test_lda_abs_y_positive() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  cpu.PC = 0x0100; // Arbitrary position
+  cpu.Y = 0x01;
+  word testAddress = 0x0010;
+  byte testValue = 0x78;
+  writeByte(&memory, (testAddress + cpu.Y), testValue);
+
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABSY);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(!(cpu.PS & NEGATIVE_FLAG));
+  CU_ASSERT(!(cpu.PS & ZERO_FLAG));
+  CU_ASSERT(cycles == 0);
+}
+
+void test_lda_abs_y_zero() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  word testAddress = 0x0010;
+  byte testValue = 0x00;
+  writeByte(&memory, testAddress, testValue);
+
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABSY);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(cpu.PS & ZERO_FLAG);
+  CU_ASSERT(!(cpu.PS & NEGATIVE_FLAG));
+  CU_ASSERT(cycles == 0);
+}
+
+void test_lda_abs_y_negative() {
+  reset(&cpu, &memory);
+
+  // Set up memory and CPU for test
+  word testAddress = 0x0010;
+  byte testValue = 0x80;
+  writeByte(&memory, testAddress, testValue);
+
+  // Write the opcode and address to the program counter location
+  writeByte(&memory, cpu.PC, OP_LDA_ABSY);
+  writeWord(&memory, cpu.PC + 1, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  // Assertions to ensure correct execution
+  CU_ASSERT(cpu.A == testValue);
+  CU_ASSERT(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT(!(cpu.PS & ZERO_FLAG));
+  CU_ASSERT(cycles == 0);
+}
+
 void run_cpu_tests() {
   CU_pSuite suite = CU_add_suite("CPU tests", 0, 0);
   CU_pSuite suite_op = CU_add_suite("Opcode tests", 0, 0);
 
   CU_add_test(suite, "CPU reset", test_cpu_reset);
   CU_add_test(suite, "Fetch byte", test_fetch_byte);
+  CU_add_test(suite, "Fetch word", test_fetch_word);
 
   CU_add_test(suite_op, "LDA Immediate mode with a positive value", test_lda_immediate_positive);
   CU_add_test(suite_op, "LDA Immediate mode with a zero value", test_lda_immediate_zero);
@@ -399,17 +482,21 @@ void run_cpu_tests() {
   CU_add_test(suite_op, "LDA Zero Page mode with a zero value", test_lda_zero_page_zero);
   CU_add_test(suite_op, "LDA Zero Page mode with a negative value", test_lda_zero_page_negative);
 
-  CU_add_test(suite_op, "LDA Zero Page X with Positive Value", test_lda_zpx_positive);
-  CU_add_test(suite_op, "LDA Zero Page X with Zero", test_lda_zpx_zero);
-  CU_add_test(suite_op, "LDA Zero Page X with Negative Value", test_lda_zpx_negative);
-  CU_add_test(suite_op, "LDA Zero Page X with X=0", test_lda_zpx_x_is_zero);
+  CU_add_test(suite_op, "LDA Zero Page X-indexed with Positive Value", test_lda_zpx_positive);
+  CU_add_test(suite_op, "LDA Zero Page X-indexed with Zero", test_lda_zpx_zero);
+  CU_add_test(suite_op, "LDA Zero Page X-indexed with Negative Value", test_lda_zpx_negative);
+  CU_add_test(suite_op, "LDA Zero Page X-indexed with X=0", test_lda_zpx_x_is_zero);
 
   CU_add_test(suite_op, "LDA Absolute mode with positive value", test_lda_abs_positive);
   CU_add_test(suite_op, "LDA Absolute mode with zero", test_lda_abs_zero);
   CU_add_test(suite_op, "LDA Absolute mode with negative value", test_lda_abs_negative);
 
-  CU_add_test(suite_op, "LDA Absolute X with positive value", test_lda_abs_x_positive);
-  CU_add_test(suite_op, "LDA Absolute X with zero", test_lda_abs_x_zero);
-  CU_add_test(suite_op, "LDA Absolute X with negative value", test_lda_abs_x_negative);
-  CU_add_test(suite_op, "LDA Absolute X with page cross", test_lda_abs_x_page_cross);
+  CU_add_test(suite_op, "LDA Absolute X-indexed with positive value", test_lda_abs_x_positive);
+  CU_add_test(suite_op, "LDA Absolute X-indexed with zero", test_lda_abs_x_zero);
+  CU_add_test(suite_op, "LDA Absolute X-indexed with negative value", test_lda_abs_x_negative);
+  CU_add_test(suite_op, "LDA Absolute X-indexed with page cross", test_lda_abs_x_page_cross);
+
+  CU_add_test(suite_op, "LDA Absolute Y-indexed with positive value", test_lda_abs_y_positive);
+  CU_add_test(suite_op, "LDA Absolute Y-indexed with zero", test_lda_abs_y_zero);
+  CU_add_test(suite_op, "LDA Absolute Y-indexed with negative value", test_lda_abs_y_negative);
 }
