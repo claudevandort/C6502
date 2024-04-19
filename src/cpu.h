@@ -6,21 +6,23 @@
 
 // Processor status flags
 // |N|V|-|B|D|I|Z|C|
-#define CARRY_FLAG 0x01        // 00000001
-#define ZERO_FLAG 0x02         // 00000010
-#define IRQ_DISABLE_FLAG 0x04  // 00000100
+#define CARRY_FLAG        0x01 // 00000001
+#define ZERO_FLAG         0x02 // 00000010
+#define IRQ_DISABLE_FLAG  0x04 // 00000100
 #define DECIMAL_MODE_FLAG 0x08 // 00001000
-#define BREAK_FLAG 0x10        // 00010000
-#define UNUSED_FLAG 0x20       // 00100000
-#define OVERFLOW_FLAG 0x40     // 01000000
-#define NEGATIVE_FLAG 0x80     // 10000000
+#define BREAK_FLAG        0x10 // 00010000
+#define UNUSED_FLAG       0x20 // 00100000
+#define OVERFLOW_FLAG     0x40 // 01000000
+#define NEGATIVE_FLAG     0x80 // 10000000
 
 // Opcodes
 // LDA - Load accumulator with memory
-#define OP_LDA_IM 0xA9 // Immediate addressing mode
-#define OP_LDA_ZP 0xA5 // Zero page addressing mode
-#define OP_LDA_ZPX 0xB5 // Zero page X addressing mode
-#define OP_LDA_ABS 0xAD // Absolute addressing mode
+#define OP_LDA_IM   0xA9 // Immediate addressing mode
+#define OP_LDA_ZP   0xA5 // Zero page addressing mode
+#define OP_LDA_ZPX  0xB5 // Zero page X-indexed addressing mode
+#define OP_LDA_ABS  0xAD // Absolute addressing mode
+#define OP_LDA_ABSX 0xBD // Absolute X-indexed addressing mode
+#define OP_LDA_ABSY 0xB9 // Absolute Y-indexed addressing mode
 
 typedef struct {
   word PC; // Program counter
@@ -37,7 +39,17 @@ typedef void (*instructionHandler)(CPU *cpu, Memory *memory, uint *cycles);
 
 void initInstructions();
 void reset(CPU *cpu, Memory *memory);
-byte fetchByte(CPU *cpu, Memory *memory, uint *cycles);
+byte CPUreadByte(const Memory *memory, const word address, uint *cycles);
+byte fetchByte(CPU *cpu, const Memory *memory, uint *cycles);
+word fetchWord(CPU *cpu, const Memory *memory, uint *cycles);
 void execute(CPU *cpu, Memory *memory, uint *cycles);
+
+void LDA_setPS(CPU *cpu);
+void LDA_IM(CPU *cpu, Memory *memory, uint *cycles);
+void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles);
+void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles);
+void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles);
+void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles);
+void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles);
 
 #endif

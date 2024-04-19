@@ -14,18 +14,18 @@ void reset(CPU *cpu, Memory *memory) {
   initInstructions();
 }
 
-byte CPUreadByte(Memory *memory, word address, uint *cycles) {
+byte CPUreadByte(const Memory *memory, const word address, uint *cycles) {
   (*cycles)--;
   return memory->data[address];
 }
 
-byte fetchByte(CPU *cpu, Memory *memory, uint *cycles) {
+byte fetchByte(CPU *cpu, const Memory *memory, uint *cycles) {
   byte data = CPUreadByte(memory, cpu->PC, cycles);
   cpu->PC++;
   return data;
 }
 
-word fetchWord(CPU *cpu, Memory *memory, uint *cycles) {
+word fetchWord(CPU *cpu, const Memory *memory, uint *cycles) {
   byte low = fetchByte(cpu, memory, cycles);
   byte high = fetchByte(cpu, memory, cycles);
   word data = (high << 8) | low;
@@ -43,6 +43,10 @@ void LDA_setPS(CPU *cpu) {
 }
 
 // LDA immediate addressing mode
+// Assembly: LDA #$nn
+// Opcode: 0xA9
+// Bytes: 2
+// Cycles: 2
 void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
   byte data = fetchByte(cpu, memory, cycles);
   cpu->A = data;
@@ -50,6 +54,10 @@ void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
 }
 
 // LDA zero page addressing mode
+// Assembly: LDA $nn
+// Opcode: 0xA5
+// Bytes: 2
+// Cycles: 3
 void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
   byte data = CPUreadByte(memory, address, cycles);
@@ -57,18 +65,59 @@ void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
   LDA_setPS(cpu);
 }
 
-// LDA zero page X addressing mode
+// LDA zero page X-indexed addressing mode
+// Assembly: LDA $nn,X
+// Opcode: 0xB5
+// Bytes: 2
+// Cycles: 4
 void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
   address = (address + cpu->X) % 256;
+  (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
 }
 
 // LDA absolute addressing mode
+// Assembly: LDA $nnnn
+// Opcode: 0xAD
+// Bytes: 3
+// Cycles: 4
 void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
   word address = fetchWord(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->A = data;
+  LDA_setPS(cpu);
+}
+
+// LDA absolute X-indexed addressing mode
+// Assembly: LDA $nnnn,X
+// Opcode: 0xBD
+// Bytes: 3
+// Cycles: 4-5
+void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address += cpu->X;
+  byte high = (address >> 8) & 0xFF;
+  if (high != 0x00)
+    (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->A = data;
+  LDA_setPS(cpu);
+}
+
+// LDA absolute Y-indexed addressing mode
+// Assembly: LDA $nnnn,Y
+// Opcode: 0xB9
+// Bytes: 3
+// Cycles: 4-5
+void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address += cpu->Y;
+  byte high = (address >> 8) & 0xFF;
+  if (high != 0x00)
+      (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
@@ -81,14 +130,14 @@ void initInstructions() {
   instructions[OP_LDA_ZP] = LDA_ZP;
   instructions[OP_LDA_ZPX] = LDA_ZPX;
   instructions[OP_LDA_ABS] = LDA_ABS;
+  instructions[OP_LDA_ABSX] = LDA_ABSX;
+  instructions[OP_LDA_ABSY] = LDA_ABSY;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {
   while(*cycles > 0) {
     byte opcode = fetchByte(cpu, memory, cycles);
     instructionHandler handler = instructions[opcode];
-    if(handler) {
-      handler(cpu, memory, cycles);
-    }
+    handler(cpu, memory, cycles);
   }
 }

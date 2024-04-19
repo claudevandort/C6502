@@ -1,10 +1,11 @@
 CC = gcc
 COMPILER_FLAGS = -Wall -Wfatal-errors
 LANG_STD = -std=c99
-SOURCE = src/*.c
+SOURCE = tests/*.c src/memory.c src/cpu.c
 OUTPUT = bin/C6502
 
-TEST_OUTPUT = bin/tests
+DEBUG_FLAGS = -g
+OUTPUT = bin/tests
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
@@ -17,13 +18,18 @@ ifeq ($(UNAME_S), Darwin)
 endif
 
 build:
-	$(CC) $(COMPILER_FLAGS) $(LANG_STD) $(SOURCE) -o $(OUTPUT)
+	$(CC) $(COMPILER_FLAGS) $(LANG_STD) $(SOURCE) \
+		$(INCLUDE_PATHS) $(LIBRARY_PATHS) -o $(OUTPUT) -lcunit
+
+debug-build:
+	$(CC) $(COMPILER_FLAGS) $(DEBUG_FLAGS) $(LANG_STD) $(SOURCE) \
+		$(INCLUDE_PATHS) $(LIBRARY_PATHS) -o $(OUTPUT) -lcunit
 
 run:
 	./$(OUTPUT)
 
 test:
-	$(CC) $(COMPILER_FLAGS) $(LANG_STD) \
-	tests/*.c src/memory.c src/cpu.c \
-	$(INCLUDE_PATHS) $(LIBRARY_PATHS) \
-	-o $(TEST_OUTPUT) -lcunit && ./$(TEST_OUTPUT)
+	make build && make run
+
+debug:
+	make debug-build && make run
