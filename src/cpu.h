@@ -23,6 +23,8 @@
 #define OP_LDA_ABS  0xAD // Absolute addressing mode
 #define OP_LDA_ABSX 0xBD // Absolute X-indexed addressing mode
 #define OP_LDA_ABSY 0xB9 // Absolute Y-indexed addressing mode
+// #define OP_LDA_INDX 0xA1 // Indirect X-indexed addressing mode
+// #define OP_LDA_INDY 0xB1 // Indirect Y-indexed addressing mode
 
 typedef struct {
   word PC; // Program counter

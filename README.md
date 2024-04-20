@@ -11,25 +11,23 @@ I chose C99 since I want as little language abstractions as possible, and also, 
 ## Features
 
 - CPU/memory model, and basic operations.
-- Implementation of [opcodes](http://www.6502.org/tutorials/6502opcodes.html) (probably won't be complete).
-- Testing of capabilities using CUnit.
+- Implementation of [opcodes](http://www.6502.org/tutorials/6502opcodes.html) (still in progress).
+- Testing of capabilities using [CUnit](https://cunit.sourceforge.net).
 
 ## Getting started
 
-Compile
+### Compile
 
-```bash
-make build
-```
+The main function in this project just runs the tests:
 
-Run demo
-
-```bash
-make run
-```
-
-Build and run tests
-
-```bash
+```shell
 make test
+```
+
+### Debug
+
+Additionally, you can choose to debug the test execution, for that you can make a debug build and then debug using GDB or LLDB.
+
+```shell
+make debug-build
 ```
