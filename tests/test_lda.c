@@ -562,31 +562,31 @@ void test_lda_abs_y_negative() {
 }
 
 void run_lda_tests() {
-  CU_pSuite suite_op = CU_add_suite("LDA tests", 0, 0);
+  CU_pSuite suite = CU_add_suite("LDA tests", 0, 0);
 
-  CU_add_test(suite_op, "LDA Immediate mode with a positive value", test_lda_immediate_positive);
-  CU_add_test(suite_op, "LDA Immediate mode with a zero value", test_lda_immediate_zero);
-  CU_add_test(suite_op, "LDA Immediate mode with a negative value", test_lda_immediate_negative);
+  CU_add_test(suite, "Immediate mode with a positive value", test_lda_immediate_positive);
+  CU_add_test(suite, "Immediate mode with a zero value", test_lda_immediate_zero);
+  CU_add_test(suite, "Immediate mode with a negative value", test_lda_immediate_negative);
 
-  CU_add_test(suite_op, "LDA Zero Page mode with a positive value", test_lda_zero_page_positive);
-  CU_add_test(suite_op, "LDA Zero Page mode with a zero value", test_lda_zero_page_zero);
-  CU_add_test(suite_op, "LDA Zero Page mode with a negative value", test_lda_zero_page_negative);
+  CU_add_test(suite, "Zero Page mode with a positive value", test_lda_zero_page_positive);
+  CU_add_test(suite, "Zero Page mode with a zero value", test_lda_zero_page_zero);
+  CU_add_test(suite, "Zero Page mode with a negative value", test_lda_zero_page_negative);
 
-  CU_add_test(suite_op, "LDA Zero Page X-indexed with Positive Value", test_lda_zpx_positive);
-  CU_add_test(suite_op, "LDA Zero Page X-indexed with Zero", test_lda_zpx_zero);
-  CU_add_test(suite_op, "LDA Zero Page X-indexed with Negative Value", test_lda_zpx_negative);
-  CU_add_test(suite_op, "LDA Zero Page X-indexed with X=0", test_lda_zpx_x_is_zero);
+  CU_add_test(suite, "Zero Page X-indexed with Positive Value", test_lda_zpx_positive);
+  CU_add_test(suite, "Zero Page X-indexed with Zero", test_lda_zpx_zero);
+  CU_add_test(suite, "Zero Page X-indexed with Negative Value", test_lda_zpx_negative);
+  CU_add_test(suite, "Zero Page X-indexed with X=0", test_lda_zpx_x_is_zero);
 
-  CU_add_test(suite_op, "LDA Absolute mode with positive value", test_lda_abs_positive);
-  CU_add_test(suite_op, "LDA Absolute mode with zero", test_lda_abs_zero);
-  CU_add_test(suite_op, "LDA Absolute mode with negative value", test_lda_abs_negative);
+  CU_add_test(suite, "Absolute mode with positive value", test_lda_abs_positive);
+  CU_add_test(suite, "Absolute mode with zero", test_lda_abs_zero);
+  CU_add_test(suite, "Absolute mode with negative value", test_lda_abs_negative);
 
-  CU_add_test(suite_op, "LDA Absolute X-indexed with positive value", test_lda_abs_x_positive);
-  CU_add_test(suite_op, "LDA Absolute X-indexed with zero", test_lda_abs_x_zero);
-  CU_add_test(suite_op, "LDA Absolute X-indexed with negative value", test_lda_abs_x_negative);
-  CU_add_test(suite_op, "LDA Absolute X-indexed with page cross", test_lda_abs_x_page_cross);
+  CU_add_test(suite, "Absolute X-indexed with positive value", test_lda_abs_x_positive);
+  CU_add_test(suite, "Absolute X-indexed with zero", test_lda_abs_x_zero);
+  CU_add_test(suite, "Absolute X-indexed with negative value", test_lda_abs_x_negative);
+  CU_add_test(suite, "Absolute X-indexed with page cross", test_lda_abs_x_page_cross);
 
-  CU_add_test(suite_op, "LDA Absolute Y-indexed with positive value", test_lda_abs_y_positive);
-  CU_add_test(suite_op, "LDA Absolute Y-indexed with zero", test_lda_abs_y_zero);
-  CU_add_test(suite_op, "LDA Absolute Y-indexed with negative value", test_lda_abs_y_negative);
+  CU_add_test(suite, "Absolute Y-indexed with positive value", test_lda_abs_y_positive);
+  CU_add_test(suite, "Absolute Y-indexed with zero", test_lda_abs_y_zero);
+  CU_add_test(suite, "Absolute Y-indexed with negative value", test_lda_abs_y_negative);
 }

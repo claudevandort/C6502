@@ -80,6 +80,9 @@ void execute(CPU *cpu, Memory *memory, uint *cycles);
 // #define OP_LDA_INDX 0xA1 // Indirect X-indexed addressing mode
 // #define OP_LDA_INDY 0xB1 // Indirect Y-indexed addressing mode
 
+// LDX - Load index X with memory
+#define OP_LDX_IM   0xA2 // Immediate addressing mode
+
 void LDA_setPS(CPU *cpu);
 void LDA_IM(CPU *cpu, Memory *memory, uint *cycles);
 void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles);
@@ -87,5 +90,8 @@ void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles);
 void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles);
 void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles);
 void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles);
+
+void LDX_setPS(CPU *cpu);
+void LDX_IM(CPU *cpu, Memory *memory, uint *cycles);
 
 #endif

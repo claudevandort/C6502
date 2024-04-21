@@ -69,6 +69,8 @@ void initInstructions() {
   instructions[OP_LDA_ABS] = LDA_ABS;
   instructions[OP_LDA_ABSX] = LDA_ABSX;
   instructions[OP_LDA_ABSY] = LDA_ABSY;
+
+  instructions[OP_LDX_IM] = LDX_IM;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {
@@ -172,4 +174,25 @@ void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
+}
+
+/*
+ * LDX instruction
+ */
+
+// Set the processor status flags
+void LDX_setPS(CPU *cpu) {
+  cpu->PS = (cpu->X == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  cpu->PS = (cpu->X & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+}
+
+// LDX immediate addressing mode
+// Assembly: LDX #$nn
+// Opcode: 0xA2
+// Bytes: 2
+// Cycles: 2
+void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
+  byte data = fetchByte(cpu, memory, cycles);
+  cpu->X = data;
+  LDX_setPS(cpu);
 }
