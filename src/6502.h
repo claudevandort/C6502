@@ -84,6 +84,7 @@ void execute(CPU *cpu, Memory *memory, uint *cycles);
 #define OP_LDX_IM   0xA2 // Immediate addressing mode
 #define OP_LDX_ZP   0xA6 // Zero page addressing mode
 #define OP_LDX_ZPY  0xB6 // Zero page Y-indexed addressing mode
+#define OP_LDX_ABS  0xAE // Absolute addressing mode
 
 void LDA_setPS(CPU *cpu);
 void LDA_IM(CPU *cpu, Memory *memory, uint *cycles);
@@ -97,5 +98,6 @@ void LDX_setPS(CPU *cpu);
 void LDX_IM(CPU *cpu, Memory *memory, uint *cycles);
 void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles);
 void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles);
+void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles);
 
 #endif

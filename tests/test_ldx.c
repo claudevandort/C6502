@@ -256,6 +256,81 @@ void test_ldx_zpy_y_is_zero() {
   CU_ASSERT_EQUAL(cycles, 0);
 }
 
+void test_ldx_abs_positive() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x1234;
+  byte testValue = 0x7F;
+
+  cpu.PC = startingAddress;
+  writeByte(&memory, testAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABS);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
+void test_ldx_abs_zero() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x1234;
+  byte testValue = 0x00;
+
+  cpu.PC = startingAddress;
+  writeByte(&memory, testAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABS);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_TRUE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
+void test_ldx_abs_negative() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x1234;
+  byte testValue = 0x80;
+
+  cpu.PC = startingAddress;
+  writeByte(&memory, testAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABS);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_TRUE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
 void run_ldx_tests() {
   CU_pSuite suite = CU_add_suite("LDX tests", NULL, NULL);
 
@@ -271,4 +346,8 @@ void run_ldx_tests() {
   CU_add_test(suite, "Zero page, Y-indexed mode with a zero value", test_ldx_zpy_zero);
   CU_add_test(suite, "Zero page, Y-indexed mode with a negative value", test_ldx_zpy_negative);
   CU_add_test(suite, "Zero page, Y-indexed mode with Y=0", test_ldx_zpy_y_is_zero);
+
+  CU_add_test(suite, "Absolute mode with a positive value", test_ldx_abs_positive);
+  CU_add_test(suite, "Absolute mode with a zero value", test_ldx_abs_zero);
+  CU_add_test(suite, "Absolute mode with a negative value", test_ldx_abs_negative);
 }
