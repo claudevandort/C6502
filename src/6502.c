@@ -72,6 +72,7 @@ void initInstructions() {
 
   instructions[OP_LDX_IM] = LDX_IM;
   instructions[OP_LDX_ZP] = LDX_ZP;
+  instructions[OP_LDX_ZPY] = LDX_ZPY;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {
@@ -197,6 +198,7 @@ void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
   cpu->X = data;
   LDX_setPS(cpu);
 }
+
 // LDX zero page addressing mode
 // Assembly: LDX $nn
 // Opcode: 0xA6
@@ -204,6 +206,20 @@ void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
 // Cycles: 3
 void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->X = data;
+  LDX_setPS(cpu);
+}
+
+// LDX zero page Y-indexed addressing mode
+// Assembly: LDX $nn,Y
+// Opcode: 0xB6
+// Bytes: 2
+// Cycles: 4
+void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
+  byte address = fetchByte(cpu, memory, cycles);
+  address = (address + cpu->Y) % 256;
+  (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->X = data;
   LDX_setPS(cpu);
