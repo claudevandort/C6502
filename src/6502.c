@@ -90,6 +90,24 @@ void execute(CPU *cpu, Memory *memory, uint *cycles) {
  */
 
 /*
+ * Addressing modes
+ */
+
+/*
+ * Immediate addressing mode
+ * Assenbly: OP #$nn
+ * Bytes: 2
+ * Cycles: 2
+ */
+void ADDR_IM(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  byte data = fetchByte(cpu, memory, cycles);
+  *target = data;
+  
+  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+}
+
+/*
  * LDA instruction
  */
 
@@ -105,9 +123,7 @@ void LDA_setPS(CPU *cpu) {
 // Bytes: 2
 // Cycles: 2
 void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
-  byte data = fetchByte(cpu, memory, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_IM(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA zero page addressing mode
@@ -196,9 +212,7 @@ void LDX_setPS(CPU *cpu) {
 // Bytes: 2
 // Cycles: 2
 void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
-  byte data = fetchByte(cpu, memory, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_IM(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX zero page addressing mode
