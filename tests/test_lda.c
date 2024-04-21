@@ -1,9 +1,5 @@
 #include "CUnit/Basic.h"
-#include "../src/cpu.h"
-#include "../src/memory.h"
-
-CPU cpu;
-Memory memory;
+#include "../src/6502.h"
 
 void test_lda_immediate_positive() {
   reset(&cpu, &memory);

@@ -1,4 +1,5 @@
 #include "CUnit/Basic.h"
+#include "../src/6502.h"
 #include "test_truth.h"
 #include "test_memory.h"
 #include "test_cpu.h"

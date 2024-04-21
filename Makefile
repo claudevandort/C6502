@@ -1,7 +1,7 @@
 CC = gcc
 COMPILER_FLAGS = -Wall -Wfatal-errors
 LANG_STD = -std=c99
-SOURCE = tests/*.c src/memory.c src/cpu.c
+SOURCE = tests/*.c src/6502.c
 OUTPUT = bin/C6502
 
 DEBUG_FLAGS = -g

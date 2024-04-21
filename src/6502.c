@@ -1,5 +1,33 @@
-#include "cpu.h"
-#include "memory.h"
+#include "6502.h"
+
+/*
+ * Basic Memory functions
+ */
+
+void initMemory(Memory* memory) {
+  for(int i = 0; i < MEMORY_SIZE; i++) {
+    memory->data[i] = 0x00;
+  }
+}
+
+byte readByte(Memory* memory, word address) {
+  return memory->data[address];
+}
+
+void writeByte(Memory* memory, word address, byte value) {
+  memory->data[address] = value;
+}
+
+word readWord(Memory* memory, word address) {
+  word low = memory->data[address];
+  word high = memory->data[address + 1];
+  return low | (high << 8);
+}
+
+void writeWord(Memory* memory, word address, word value) {
+  memory->data[address] = value & 0xFF;
+  memory->data[address + 1] = (value >> 8) & 0xFF;
+}
 
 /*
  * Basic CPU functions
@@ -32,9 +60,32 @@ word fetchWord(CPU *cpu, const Memory *memory, uint *cycles) {
   return data;
 }
 
+instructionHandler instructions[256];
+
+void initInstructions() {
+  instructions[OP_LDA_IM] = LDA_IM;
+  instructions[OP_LDA_ZP] = LDA_ZP;
+  instructions[OP_LDA_ZPX] = LDA_ZPX;
+  instructions[OP_LDA_ABS] = LDA_ABS;
+  instructions[OP_LDA_ABSX] = LDA_ABSX;
+  instructions[OP_LDA_ABSY] = LDA_ABSY;
+}
+
+void execute(CPU *cpu, Memory *memory, uint *cycles) {
+  while(*cycles > 0) {
+    byte opcode = fetchByte(cpu, memory, cycles);
+    instructionHandler handler = instructions[opcode];
+    handler(cpu, memory, cycles);
+  }
+}
+
+/*
+ * Opcodes implementation
+ */
+
 /*
  * LDA instruction
-*/
+ */
 
 // Set the processor status flags
 void LDA_setPS(CPU *cpu) {
@@ -121,23 +172,4 @@ void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
   byte data = CPUreadByte(memory, address, cycles);
   cpu->A = data;
   LDA_setPS(cpu);
-}
-
-instructionHandler instructions[256];
-
-void initInstructions() {
-  instructions[OP_LDA_IM] = LDA_IM;
-  instructions[OP_LDA_ZP] = LDA_ZP;
-  instructions[OP_LDA_ZPX] = LDA_ZPX;
-  instructions[OP_LDA_ABS] = LDA_ABS;
-  instructions[OP_LDA_ABSX] = LDA_ABSX;
-  instructions[OP_LDA_ABSY] = LDA_ABSY;
-}
-
-void execute(CPU *cpu, Memory *memory, uint *cycles) {
-  while(*cycles > 0) {
-    byte opcode = fetchByte(cpu, memory, cycles);
-    instructionHandler handler = instructions[opcode];
-    handler(cpu, memory, cycles);
-  }
 }

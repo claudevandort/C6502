@@ -1,9 +1,5 @@
 #include "CUnit/Basic.h"
-#include "../src/cpu.h"
-#include "../src/memory.h"
-
-Memory memory;
-CPU cpu;
+#include "../src/6502.h"
 
 void test_cpu_reset() {
   reset(&cpu, &memory);
