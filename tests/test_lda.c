@@ -2,6 +2,8 @@
 #include "../src/6502.h"
 
 void test_lda_immediate_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -21,6 +23,8 @@ void test_lda_immediate_positive() {
 }
 
 void test_lda_immediate_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
   
   word startingAddress = 0x0100;
@@ -40,6 +44,8 @@ void test_lda_immediate_zero() {
 }
 
 void test_lda_immediate_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -59,6 +65,8 @@ void test_lda_immediate_negative() {
 }
 
 void test_lda_zero_page_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set a test value in zero page memory
@@ -84,6 +92,8 @@ void test_lda_zero_page_positive() {
 }
 
 void test_lda_zero_page_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set a test value in zero page memory
@@ -109,6 +119,8 @@ void test_lda_zero_page_zero() {
 }
 
 void test_lda_zero_page_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set a test value in zero page memory
@@ -134,6 +146,8 @@ void test_lda_zero_page_negative() {
 }
 
 void test_lda_zpx_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -160,6 +174,8 @@ void test_lda_zpx_positive() {
 }
 
 void test_lda_zpx_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -186,6 +202,8 @@ void test_lda_zpx_zero() {
 }
 
 void test_lda_zpx_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -212,6 +230,8 @@ void test_lda_zpx_negative() {
 }
 
 void test_lda_zpx_x_is_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word startingAddress = 0x0100;
@@ -238,6 +258,8 @@ void test_lda_zpx_x_is_zero() {
 }
 
 void test_lda_abs_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -264,6 +286,8 @@ void test_lda_abs_positive() {
 }
 
 void test_lda_abs_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -290,6 +314,8 @@ void test_lda_abs_zero() {
 }
 
 void test_lda_abs_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -316,6 +342,8 @@ void test_lda_abs_negative() {
 }
 
 void test_lda_abs_x_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -346,6 +374,8 @@ void test_lda_abs_x_positive() {
 }
 
 void test_lda_abs_x_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -376,6 +406,8 @@ void test_lda_abs_x_zero() {
 }
 
 void test_lda_abs_x_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -406,6 +438,8 @@ void test_lda_abs_x_negative() {
 }
 
 void test_lda_abs_x_page_cross() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -435,6 +469,8 @@ void test_lda_abs_x_page_cross() {
 }
 
 void test_lda_abs_y_positive() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -464,6 +500,8 @@ void test_lda_abs_y_positive() {
 }
 
 void test_lda_abs_y_zero() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test
@@ -493,6 +531,8 @@ void test_lda_abs_y_zero() {
 }
 
 void test_lda_abs_y_negative() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   // Set up memory and CPU for test

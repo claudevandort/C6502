@@ -2,6 +2,8 @@
 #include "../src/6502.h"
 
 void test_cpu_reset() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   CU_ASSERT_EQUAL(cpu.PC, 0xFFFC);
@@ -13,6 +15,8 @@ void test_cpu_reset() {
 }
 
 void test_fetch_byte() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word testAddress = 0x1000;
@@ -29,6 +33,8 @@ void test_fetch_byte() {
 }
 
 void test_fetch_word() {
+  CPU cpu;
+  Memory memory;
   reset(&cpu, &memory);
 
   word testAddress = 0x1000;

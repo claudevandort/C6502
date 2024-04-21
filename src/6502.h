@@ -24,8 +24,6 @@ typedef struct {
   byte data[MEMORY_SIZE];
 } Memory;
 
-Memory memory;
-
 void initMemory(Memory *memory);
 byte readByte(Memory *memory, word address);
 void writeByte(Memory *memory, word address, byte value);
@@ -61,8 +59,6 @@ typedef struct {
   byte PS; // Processor status flags
 
 } CPU;
-
-CPU cpu;
 
 typedef void (*instructionHandler)(CPU *cpu, Memory *memory, uint *cycles);
 
