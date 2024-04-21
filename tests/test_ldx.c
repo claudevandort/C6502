@@ -331,6 +331,93 @@ void test_ldx_abs_negative() {
   CU_ASSERT_EQUAL(cycles, 0);
 }
 
+void test_ldx_abs_y_positive() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x0010;
+  byte testValue = 0x78;
+  byte yIndex = 0x01;
+  word yIndexedAddress = testAddress + yIndex;
+
+  cpu.PC = startingAddress;
+  cpu.Y = yIndex;
+
+  writeByte(&memory, yIndexedAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABSY);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
+void test_ldx_abs_y_zero() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x0010;
+  byte testValue = 0x00;
+  byte yIndex = 0x01;
+  word yIndexedAddress = testAddress + yIndex;
+
+  cpu.PC = startingAddress;
+  cpu.Y = yIndex;
+
+  writeByte(&memory, yIndexedAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABSY);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_TRUE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
+void test_ldx_abs_y_negative() {
+  CPU cpu;
+  Memory memory;
+  reset(&cpu, &memory);
+
+  word startingAddress = 0x0100;
+  word testAddress = 0x0010;
+  byte testValue = 0x80;
+  byte yIndex = 0x01;
+  word yIndexedAddress = testAddress + yIndex;
+
+  cpu.PC = startingAddress;
+  cpu.Y = yIndex;
+
+  writeByte(&memory, yIndexedAddress, testValue);
+
+  writeByte(&memory, startingAddress, OP_LDX_ABSY);
+  writeWord(&memory, startingAddress + 0x01, testAddress);
+
+  uint cycles = 4;
+  execute(&cpu, &memory, &cycles);
+
+  CU_ASSERT_EQUAL(cpu.X, testValue);
+  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x03);
+  CU_ASSERT_TRUE(cpu.PS & NEGATIVE_FLAG);
+  CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
+  CU_ASSERT_EQUAL(cycles, 0);
+}
+
 void run_ldx_tests() {
   CU_pSuite suite = CU_add_suite("LDX tests", NULL, NULL);
 
@@ -350,4 +437,8 @@ void run_ldx_tests() {
   CU_add_test(suite, "Absolute mode with a positive value", test_ldx_abs_positive);
   CU_add_test(suite, "Absolute mode with a zero value", test_ldx_abs_zero);
   CU_add_test(suite, "Absolute mode with a negative value", test_ldx_abs_negative);
+
+  CU_add_test(suite, "Absolute, Y-indexed mode with a positive value", test_ldx_abs_y_positive);
+  CU_add_test(suite, "Absolute, Y-indexed mode with a zero value", test_ldx_abs_y_zero);
+  CU_add_test(suite, "Absolute, Y-indexed mode with a negative value", test_ldx_abs_y_negative);
 }

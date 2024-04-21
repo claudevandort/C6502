@@ -74,6 +74,7 @@ void initInstructions() {
   instructions[OP_LDX_ZP] = LDX_ZP;
   instructions[OP_LDX_ZPY] = LDX_ZPY;
   instructions[OP_LDX_ABS] = LDX_ABS;
+  instructions[OP_LDX_ABSY] = LDX_ABSY;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {
@@ -233,6 +234,22 @@ void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
 // Cycles: 4
 void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
   word address = fetchWord(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  cpu->X = data;
+  LDX_setPS(cpu);
+}
+
+// LDX absolute Y-indexed addressing mode
+// Assembly: LDX $nnnn,Y
+// Opcode: 0xBE
+// Bytes: 3
+// Cycles: 4-5
+void LDX_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address += cpu->Y;
+  byte high = (address >> 8) & 0xFF;
+  if (high != 0x00)
+      (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
   cpu->X = data;
   LDX_setPS(cpu);
