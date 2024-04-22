@@ -215,17 +215,9 @@ void ADDR_ABSY(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
  * LDA instruction
  */
 
-// Set the processor status flags
-void LDA_setPS(CPU *cpu) {
-  cpu->PS = (cpu->A == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (cpu->A & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
-}
-
 // LDA immediate addressing mode
 // Assembly: LDA #$nn
 // Opcode: 0xA9
-// Bytes: 2
-// Cycles: 2
 void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_IM(cpu, memory, &cpu->A, cycles);
 }
@@ -233,8 +225,6 @@ void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA zero page addressing mode
 // Assembly: LDA $nn
 // Opcode: 0xA5
-// Bytes: 2
-// Cycles: 3
 void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ZP(cpu, memory, &cpu->A, cycles);
 }
@@ -242,8 +232,6 @@ void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA zero page X-indexed addressing mode
 // Assembly: LDA $nn,X
 // Opcode: 0xB5
-// Bytes: 2
-// Cycles: 4
 void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ZPX(cpu, memory, &cpu->A, cycles);
 }
@@ -251,8 +239,6 @@ void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA absolute addressing mode
 // Assembly: LDA $nnnn
 // Opcode: 0xAD
-// Bytes: 3
-// Cycles: 4
 void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABS(cpu, memory, &cpu->A, cycles);
 }
@@ -260,8 +246,6 @@ void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA absolute X-indexed addressing mode
 // Assembly: LDA $nnnn,X
 // Opcode: 0xBD
-// Bytes: 3
-// Cycles: 4-5
 void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABSX(cpu, memory, &cpu->A, cycles);
 }
@@ -269,8 +253,6 @@ void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
 // LDA absolute Y-indexed addressing mode
 // Assembly: LDA $nnnn,Y
 // Opcode: 0xB9
-// Bytes: 3
-// Cycles: 4-5
 void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABSY(cpu, memory, &cpu->A, cycles);
 }
@@ -279,17 +261,9 @@ void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
  * LDX instruction
  */
 
-// Set the processor status flags
-void LDX_setPS(CPU *cpu) {
-  cpu->PS = (cpu->X == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (cpu->X & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
-}
-
 // LDX immediate addressing mode
 // Assembly: LDX #$nn
 // Opcode: 0xA2
-// Bytes: 2
-// Cycles: 2
 void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_IM(cpu, memory, &cpu->X, cycles);
 }
@@ -297,8 +271,6 @@ void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
 // LDX zero page addressing mode
 // Assembly: LDX $nn
 // Opcode: 0xA6
-// Bytes: 2
-// Cycles: 3
 void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ZP(cpu, memory, &cpu->X, cycles);
 }
@@ -306,8 +278,6 @@ void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
 // LDX zero page Y-indexed addressing mode
 // Assembly: LDX $nn,Y
 // Opcode: 0xB6
-// Bytes: 2
-// Cycles: 4
 void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ZPY(cpu, memory, &cpu->X, cycles);
 }
@@ -315,8 +285,6 @@ void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
 // LDX absolute addressing mode
 // Assembly: LDX $nnnn
 // Opcode: 0xAE
-// Bytes: 3
-// Cycles: 4
 void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABS(cpu, memory, &cpu->X, cycles);
 }
@@ -324,8 +292,6 @@ void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
 // LDX absolute Y-indexed addressing mode
 // Assembly: LDX $nnnn,Y
 // Opcode: 0xBE
-// Bytes: 3
-// Cycles: 4-5
 void LDX_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABSY(cpu, memory, &cpu->X, cycles);
 }
