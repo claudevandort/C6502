@@ -108,6 +108,21 @@ void ADDR_IM(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
 }
 
 /*
+ * Zero page addressing mode
+ * Assembly: OP $nn
+ * Bytes: 2
+ * Cycles: 3
+ */
+void ADDR_ZP(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  byte address = fetchByte(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+}
+
+/*
  * LDA instruction
  */
 
@@ -132,10 +147,7 @@ void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 2
 // Cycles: 3
 void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_ZP(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA zero page X-indexed addressing mode
@@ -221,10 +233,7 @@ void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 2
 // Cycles: 3
 void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ZP(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX zero page Y-indexed addressing mode
