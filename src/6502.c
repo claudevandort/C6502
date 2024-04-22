@@ -176,6 +176,24 @@ void ADDR_ABS(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
 }
 
 /*
+ * Absolute X-indexed addressing mode
+ * Assembly: OP $nnnn,X
+ * Bytes: 3
+ * Cycles: 4-5
+ */
+void ADDR_ABSX(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address += cpu->X;
+  byte high = (address >> 8) & 0xFF;
+  if (high != 0x00)
+    (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
+}
+
+/*
  * LDA instruction
  */
 
@@ -227,14 +245,7 @@ void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 3
 // Cycles: 4-5
 void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  address += cpu->X;
-  byte high = (address >> 8) & 0xFF;
-  if (high != 0x00)
-    (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_ABSX(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA absolute Y-indexed addressing mode
