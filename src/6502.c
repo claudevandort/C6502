@@ -89,6 +89,15 @@ void execute(CPU *cpu, Memory *memory, uint *cycles) {
  * Opcodes implementation
  */
 
+void setPS(CPU *cpu, byte *target, byte flags) {
+  if(flags & ZERO_FLAG) {
+    cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  }
+  if(flags & NEGATIVE_FLAG) {
+    cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  }
+}
+
 /*
  * Addressing modes
  */
@@ -103,8 +112,7 @@ void ADDR_IM(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte data = fetchByte(cpu, memory, cycles);
   *target = data;
   
-  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
 /*
@@ -118,8 +126,7 @@ void ADDR_ZP(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte data = CPUreadByte(memory, address, cycles);
   *target = data;
 
-  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
 /*
@@ -135,8 +142,7 @@ void ADDR_ZPX(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte data = CPUreadByte(memory, address, cycles);
   *target = data;
 
-  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
 /*
@@ -152,8 +158,21 @@ void ADDR_ZPY(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte data = CPUreadByte(memory, address, cycles);
   *target = data;
 
-  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
+}
+
+/*
+ * Absolute addressing mode
+ * Assembly: OP $nnnn
+ * Bytes: 3
+ * Cycles: 4
+ */
+void ADDR_ABS(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
 /*
@@ -199,10 +218,7 @@ void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 3
 // Cycles: 4
 void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_ABS(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA absolute X-indexed addressing mode
@@ -280,10 +296,7 @@ void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 3
 // Cycles: 4
 void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ABS(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX absolute Y-indexed addressing mode
