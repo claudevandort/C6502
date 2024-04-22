@@ -75,6 +75,12 @@ void initInstructions() {
   instructions[OP_LDX_ZPY] = LDX_ZPY;
   instructions[OP_LDX_ABS] = LDX_ABS;
   instructions[OP_LDX_ABSY] = LDX_ABSY;
+
+  instructions[OP_LDY_IM] = LDY_IM;
+  instructions[OP_LDY_ZP] = LDY_ZP;
+  instructions[OP_LDY_ZPX] = LDY_ZPX;
+  instructions[OP_LDY_ABS] = LDY_ABS;
+  instructions[OP_LDY_ABSX] = LDY_ABSX;
 }
 
 void execute(CPU *cpu, Memory *memory, uint *cycles) {
@@ -294,4 +300,43 @@ void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
 // Opcode: 0xBE
 void LDX_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
   ADDR_ABSY(cpu, memory, &cpu->X, cycles);
+}
+
+/*
+ * LDY instruction
+ */
+
+// LDY immediate addressing mode
+// Assembly: LDY #$nn
+// Opcode: 0xA0
+void LDY_IM(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_IM(cpu, memory, &cpu->Y, cycles);
+}
+
+// LDY zero page addressing mode
+// Assembly: LDY $nn
+// Opcode: 0xA4
+void LDY_ZP(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ZP(cpu, memory, &cpu->Y, cycles);
+}
+
+// LDY zero page X-indexed addressing mode
+// Assembly: LDY $nn,X
+// Opcode: 0xB4
+void LDY_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ZPX(cpu, memory, &cpu->Y, cycles);
+}
+
+// LDY absolute addressing mode
+// Assembly: LDY $nnnn
+// Opcode: 0xAC
+void LDY_ABS(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ABS(cpu, memory, &cpu->Y, cycles);
+}
+
+// LDY absolute X-indexed addressing mode
+// Assembly: LDY $nnnn,X
+// Opcode: 0xBC
+void LDY_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ABSX(cpu, memory, &cpu->Y, cycles);
 }
