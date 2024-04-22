@@ -89,168 +89,209 @@ void execute(CPU *cpu, Memory *memory, uint *cycles) {
  * Opcodes implementation
  */
 
+void setPS(CPU *cpu, byte *target, byte flags) {
+  if(flags & ZERO_FLAG) {
+    cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  }
+  if(flags & NEGATIVE_FLAG) {
+    cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+  }
+}
+
 /*
- * LDA instruction
+ * Addressing modes
  */
 
-// Set the processor status flags
-void LDA_setPS(CPU *cpu) {
-  cpu->PS = (cpu->A == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (cpu->A & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
-}
-
-// LDA immediate addressing mode
-// Assembly: LDA #$nn
-// Opcode: 0xA9
-// Bytes: 2
-// Cycles: 2
-void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
+/*
+ * Immediate addressing mode
+ * Assenbly: OP #$nn
+ * Bytes: 2
+ * Cycles: 2
+ */
+void ADDR_IM(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte data = fetchByte(cpu, memory, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  *target = data;
+  
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
-// LDA zero page addressing mode
-// Assembly: LDA $nn
-// Opcode: 0xA5
-// Bytes: 2
-// Cycles: 3
-void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
+/*
+ * Zero page addressing mode
+ * Assembly: OP $nn
+ * Bytes: 2
+ * Cycles: 3
+ */
+void ADDR_ZP(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
   byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
-// LDA zero page X-indexed addressing mode
-// Assembly: LDA $nn,X
-// Opcode: 0xB5
-// Bytes: 2
-// Cycles: 4
-void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
+/*
+ * Zero page X-indexed addressing mode
+ * Assembly: OP $nn,X
+ * Bytes: 2
+ * Cycles: 4
+ */
+void ADDR_ZPX(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   byte address = fetchByte(cpu, memory, cycles);
   address = (address + cpu->X) % 256;
   (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
-// LDA absolute addressing mode
-// Assembly: LDA $nnnn
-// Opcode: 0xAD
-// Bytes: 3
-// Cycles: 4
-void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
+/*
+ * Zero page Y-indexed addressing mode
+ * Assembly: OP $nn,Y
+ * Bytes: 2
+ * Cycles: 4
+ */
+void ADDR_ZPY(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  byte address = fetchByte(cpu, memory, cycles);
+  address = (address + cpu->Y) % 256;
+  (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
+}
+
+/*
+ * Absolute addressing mode
+ * Assembly: OP $nnnn
+ * Bytes: 3
+ * Cycles: 4
+ */
+void ADDR_ABS(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   word address = fetchWord(cpu, memory, cycles);
   byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
 }
 
-// LDA absolute X-indexed addressing mode
-// Assembly: LDA $nnnn,X
-// Opcode: 0xBD
-// Bytes: 3
-// Cycles: 4-5
-void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
+/*
+ * Absolute X-indexed addressing mode
+ * Assembly: OP $nnnn,X
+ * Bytes: 3
+ * Cycles: 4-5
+ */
+void ADDR_ABSX(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
   word address = fetchWord(cpu, memory, cycles);
   address += cpu->X;
   byte high = (address >> 8) & 0xFF;
   if (high != 0x00)
     (*cycles)--;
   byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
+}
+
+/*
+ * Absolute Y-indexed addressing mode
+ * Assembly: OP $nnnn,Y
+ * Bytes: 3
+ * Cycles: 4-5
+ */
+void ADDR_ABSY(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  word address = fetchWord(cpu, memory, cycles);
+  address += cpu->Y;
+  byte high = (address >> 8) & 0xFF;
+  if (high != 0x00)
+    (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  setPS(cpu, target, ZERO_FLAG | NEGATIVE_FLAG);
+}
+
+/*
+ * LDA instruction
+ */
+
+// LDA immediate addressing mode
+// Assembly: LDA #$nn
+// Opcode: 0xA9
+void LDA_IM(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_IM(cpu, memory, &cpu->A, cycles);
+}
+
+// LDA zero page addressing mode
+// Assembly: LDA $nn
+// Opcode: 0xA5
+void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ZP(cpu, memory, &cpu->A, cycles);
+}
+
+// LDA zero page X-indexed addressing mode
+// Assembly: LDA $nn,X
+// Opcode: 0xB5
+void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ZPX(cpu, memory, &cpu->A, cycles);
+}
+
+// LDA absolute addressing mode
+// Assembly: LDA $nnnn
+// Opcode: 0xAD
+void LDA_ABS(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ABS(cpu, memory, &cpu->A, cycles);
+}
+
+// LDA absolute X-indexed addressing mode
+// Assembly: LDA $nnnn,X
+// Opcode: 0xBD
+void LDA_ABSX(CPU *cpu, Memory *memory, uint *cycles) {
+  ADDR_ABSX(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA absolute Y-indexed addressing mode
 // Assembly: LDA $nnnn,Y
 // Opcode: 0xB9
-// Bytes: 3
-// Cycles: 4-5
 void LDA_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  address += cpu->Y;
-  byte high = (address >> 8) & 0xFF;
-  if (high != 0x00)
-      (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_ABSY(cpu, memory, &cpu->A, cycles);
 }
 
 /*
  * LDX instruction
  */
 
-// Set the processor status flags
-void LDX_setPS(CPU *cpu) {
-  cpu->PS = (cpu->X == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
-  cpu->PS = (cpu->X & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
-}
-
 // LDX immediate addressing mode
 // Assembly: LDX #$nn
 // Opcode: 0xA2
-// Bytes: 2
-// Cycles: 2
 void LDX_IM(CPU *cpu, Memory *memory, uint *cycles) {
-  byte data = fetchByte(cpu, memory, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_IM(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX zero page addressing mode
 // Assembly: LDX $nn
 // Opcode: 0xA6
-// Bytes: 2
-// Cycles: 3
 void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ZP(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX zero page Y-indexed addressing mode
 // Assembly: LDX $nn,Y
 // Opcode: 0xB6
-// Bytes: 2
-// Cycles: 4
 void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  address = (address + cpu->Y) % 256;
-  (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ZPY(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX absolute addressing mode
 // Assembly: LDX $nnnn
 // Opcode: 0xAE
-// Bytes: 3
-// Cycles: 4
 void LDX_ABS(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ABS(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX absolute Y-indexed addressing mode
 // Assembly: LDX $nnnn,Y
 // Opcode: 0xBE
-// Bytes: 3
-// Cycles: 4-5
 void LDX_ABSY(CPU *cpu, Memory *memory, uint *cycles) {
-  word address = fetchWord(cpu, memory, cycles);
-  address += cpu->Y;
-  byte high = (address >> 8) & 0xFF;
-  if (high != 0x00)
-      (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ABSY(cpu, memory, &cpu->X, cycles);
 }
