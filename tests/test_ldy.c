@@ -1,23 +1,21 @@
 #include "CUnit/Basic.h"
 #include "../src/6502.h"
+#include "setup_tests.h"
 
 void test_ldy_immediate_positive() {
   CPU cpu;
   Memory memory;
-  reset(&cpu, &memory);
+  immediateParams params = {
+    .opcode = OP_LDY_IM, .cycles = 2,
+    .startingAddress = 0x0100, .testValue = 0x7F
+  };
 
-  word startingAddress = 0x0100;
-  byte testValue = 0x7F;
-  cpu.PC = startingAddress;
-  writeByte(&memory, startingAddress, OP_LDY_IM);
-  writeByte(&memory, startingAddress + 0x01, testValue);
+  setup_immediate(&cpu, &memory, &params);
+  execute(&cpu, &memory, &params.cycles);
 
-  uint cycles = 2;
-  execute(&cpu, &memory, &cycles);
-
-  CU_ASSERT_EQUAL(cpu.Y, testValue);
-  CU_ASSERT_EQUAL(cycles, 0);
-  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x02);
+  CU_ASSERT_EQUAL(cpu.Y, params.testValue);
+  CU_ASSERT_EQUAL(params.cycles, 0);
+  CU_ASSERT_EQUAL(cpu.PC, params.startingAddress + 0x02);
   CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
   CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
 }
@@ -25,20 +23,17 @@ void test_ldy_immediate_positive() {
 void test_ldy_immediate_zero() {
   CPU cpu;
   Memory memory;
-  reset(&cpu, &memory);
+  immediateParams params = {
+    .opcode = OP_LDY_IM, .cycles = 2,
+    .startingAddress = 0x0100, .testValue = 0x00
+  };
 
-  word startingAddress = 0x0100;
-  byte testValue = 0x00;
-  cpu.PC = startingAddress;
-  writeByte(&memory, startingAddress, OP_LDY_IM);
-  writeByte(&memory, startingAddress + 0x01, testValue);
+  setup_immediate(&cpu, &memory, &params);
+  execute(&cpu, &memory, &params.cycles);
 
-  uint cycles = 2;
-  execute(&cpu, &memory, &cycles);
-
-  CU_ASSERT_EQUAL(cpu.Y, testValue);
-  CU_ASSERT_EQUAL(cycles, 0);
-  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x02);
+  CU_ASSERT_EQUAL(cpu.Y, params.testValue);
+  CU_ASSERT_EQUAL(params.cycles, 0);
+  CU_ASSERT_EQUAL(cpu.PC, params.startingAddress + 0x02);
   CU_ASSERT_TRUE(cpu.PS & ZERO_FLAG);
   CU_ASSERT_FALSE(cpu.PS & NEGATIVE_FLAG);
 }
@@ -46,20 +41,17 @@ void test_ldy_immediate_zero() {
 void test_ldy_immediate_negative() {
   CPU cpu;
   Memory memory;
-  reset(&cpu, &memory);
+  immediateParams params = {
+    .opcode = OP_LDY_IM, .cycles = 2,
+    .startingAddress = 0x0100, .testValue = 0x80
+  };
 
-  word startingAddress = 0x0100;
-  byte testValue = 0x80;
-  cpu.PC = startingAddress;
-  writeByte(&memory, startingAddress, OP_LDY_IM);
-  writeByte(&memory, startingAddress + 0x01, testValue);
+  setup_immediate(&cpu, &memory, &params);
+  execute(&cpu, &memory, &params.cycles);
 
-  uint cycles = 2;
-  execute(&cpu, &memory, &cycles);
-
-  CU_ASSERT_EQUAL(cpu.Y, testValue);
-  CU_ASSERT_EQUAL(cycles, 0);
-  CU_ASSERT_EQUAL(cpu.PC, startingAddress + 0x02);
+  CU_ASSERT_EQUAL(cpu.Y, params.testValue);
+  CU_ASSERT_EQUAL(params.cycles, 0);
+  CU_ASSERT_EQUAL(cpu.PC, params.startingAddress + 0x02);
   CU_ASSERT_FALSE(cpu.PS & ZERO_FLAG);
   CU_ASSERT_TRUE(cpu.PS & NEGATIVE_FLAG);
 }
