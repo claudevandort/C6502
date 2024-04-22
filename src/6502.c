@@ -123,6 +123,40 @@ void ADDR_ZP(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
 }
 
 /*
+ * Zero page X-indexed addressing mode
+ * Assembly: OP $nn,X
+ * Bytes: 2
+ * Cycles: 4
+ */
+void ADDR_ZPX(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  byte address = fetchByte(cpu, memory, cycles);
+  address = (address + cpu->X) % 256;
+  (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+}
+
+/*
+ * Zero page Y-indexed addressing mode
+ * Assembly: OP $nn,Y
+ * Bytes: 2
+ * Cycles: 4
+ */
+void ADDR_ZPY(CPU *cpu, Memory *memory, byte *target, uint *cycles) {
+  byte address = fetchByte(cpu, memory, cycles);
+  address = (address + cpu->Y) % 256;
+  (*cycles)--;
+  byte data = CPUreadByte(memory, address, cycles);
+  *target = data;
+
+  cpu->PS = (*target == 0) ? (cpu->PS | ZERO_FLAG) : (cpu->PS & ~ZERO_FLAG);
+  cpu->PS = (*target & 0x80) ? (cpu->PS | NEGATIVE_FLAG) : (cpu->PS & ~NEGATIVE_FLAG);
+}
+
+/*
  * LDA instruction
  */
 
@@ -156,12 +190,7 @@ void LDA_ZP(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 2
 // Cycles: 4
 void LDA_ZPX(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  address = (address + cpu->X) % 256;
-  (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->A = data;
-  LDA_setPS(cpu);
+  ADDR_ZPX(cpu, memory, &cpu->A, cycles);
 }
 
 // LDA absolute addressing mode
@@ -242,12 +271,7 @@ void LDX_ZP(CPU *cpu, Memory *memory, uint *cycles) {
 // Bytes: 2
 // Cycles: 4
 void LDX_ZPY(CPU *cpu, Memory *memory, uint *cycles) {
-  byte address = fetchByte(cpu, memory, cycles);
-  address = (address + cpu->Y) % 256;
-  (*cycles)--;
-  byte data = CPUreadByte(memory, address, cycles);
-  cpu->X = data;
-  LDX_setPS(cpu);
+  ADDR_ZPY(cpu, memory, &cpu->X, cycles);
 }
 
 // LDX absolute addressing mode
